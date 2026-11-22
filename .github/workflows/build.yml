@@ -1,0 +1,39 @@
+
+name: Android APK bouwen
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'AllesUpdaten-source.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository ophalen
+        uses: actions/checkout@v4
+
+      - name: Java installeren
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Gradle instellen
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Project uitpakken
+        run: unzip AllesUpdaten-source.zip
+
+      - name: APK bouwen
+        run: gradle -p AllesUpdaten assembleDebug
+
+      - name: APK beschikbaar maken
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alles-Updaten-APK
+          path: AllesUpdaten/app/build/outputs/apk/debug/app-debug.apk
